@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ant
+  - Food
+  - FoodSpotter
+  - Home
   layers:
   - Default
   - TransparentFX

@@ -8,44 +8,61 @@ public class Ant : MonoBehaviour
     public float steerStrength = 2;
     public float wanderStrength = 1;
     public float avoidanceDistance = 1.5f; 
-    public float detectionRadius = 2.0f; 
+    public float detectionRadius = 2.0f;
+    public float foodDetectionDistance;
+    public float foodDetectionRadius;
 
     private Vector2 desiredDirection;
     private Rigidbody2D rb;
-    public Transform target;
+    private Transform target;
+
+    private Transform homeTarget;
 
 
     private void Start()
     {
+        target = null;
         rb = GetComponent<Rigidbody2D>();
+        homeTarget = GameObject.FindGameObjectWithTag("Home")?.transform;
     }
 
     private void Update()
     {
-        //No target, moves randomly
+        CheckForFood();
+
+        // No target, moves randomly
         Vector2 randomTarget = (desiredDirection + Random.insideUnitCircle * wanderStrength).normalized;
-        //Follows target
-        Vector2 foodTarget = ((Vector2)target.position - rb.position).normalized;
 
-        //Ant wants to go to current target
-        desiredDirection = foodTarget;
+        // Follows target
+        Vector2 foodTarget = target != null ? ((Vector2)target.position - rb.position).normalized : randomTarget;
 
+        // Set the desired direction based on the presence of a target
+        if (target != null)
+        {
+            desiredDirection = foodTarget;
+        }
+        else
+        {
+            desiredDirection = randomTarget;
+        }
+
+        // Calculate avoidance force and apply steering
         Vector2 avoidanceForce = CalculateAvoidanceForce();
-
         Vector2 desiredVelocity = (desiredDirection + avoidanceForce).normalized * maxSpeed;
         Vector2 desiredSteeringForce = (desiredVelocity - rb.velocity) * steerStrength;
         Vector2 acceleration = Vector2.ClampMagnitude(desiredSteeringForce, steerStrength);
 
-
-        //Calculated the ants speed
+        // Update the ant's speed
         rb.velocity = Vector2.ClampMagnitude(rb.velocity + acceleration * Time.deltaTime, maxSpeed);
 
-        //Turns the calculated radius into a degree, to rotate the ant
+        // Rotate the ant based on its velocity
         if (rb.velocity != Vector2.zero)
         {
             float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
             rb.rotation = angle;
         }
+
+
     }
 
 
@@ -70,6 +87,55 @@ public class Ant : MonoBehaviour
         }
         return avoidanceForce;
     }
+
+    void CheckForFood()
+    {
+        GameObject[] foodObjects = GameObject.FindGameObjectsWithTag("Food");
+
+        foreach (GameObject food in foodObjects)
+        {
+            Vector2 directionToFood = (Vector2)(food.transform.position - transform.position);
+            float distanceToFood = directionToFood.magnitude;
+
+            if (distanceToFood <= foodDetectionDistance / 2)
+            {
+                float angle = Vector2.Angle(transform.right, directionToFood);
+
+                if (angle <= foodDetectionRadius)
+                {
+                    target = food.transform;
+                }
+            }
+        }
+    }
+
+    void OnDrawGizmos()
+    {
+        // Draw the detection radius as a wire sphere
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, foodDetectionDistance);
+
+        // Draw the field of view as a cone
+        Vector3 forward = transform.right * foodDetectionDistance;
+        Vector3 rightBoundary = Quaternion.Euler(0, 0, foodDetectionRadius / 2) * forward;
+        Vector3 leftBoundary = Quaternion.Euler(0, 0, -foodDetectionRadius / 2) * forward;
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, transform.position + forward);
+        Gizmos.DrawLine(transform.position, transform.position + rightBoundary);
+        Gizmos.DrawLine(transform.position, transform.position + leftBoundary);
+    }
+
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject.tag == "Food")
+        {
+            Destroy(other.gameObject);
+            target = homeTarget;
+        }
+    }
+
 
 
 }
