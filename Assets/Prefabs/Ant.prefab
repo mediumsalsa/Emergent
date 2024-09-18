@@ -108,7 +108,7 @@ MonoBehaviour:
   avoidanceDistance: 2
   detectionRadius: 4
   foodDetectionDistance: 10
-  foodDetectionRadius: 40
+  foodDetectionRadius: 80
 --- !u!114 &2748533709956681252
 MonoBehaviour:
   m_ObjectHideFlags: 0

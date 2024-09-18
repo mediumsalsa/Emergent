@@ -8,6 +8,7 @@ TagManager:
   - Food
   - FoodSpotter
   - Home
+  - Terrain
   layers:
   - Default
   - TransparentFX

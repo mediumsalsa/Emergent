@@ -20,9 +20,7 @@ public class Ant : MonoBehaviour
     private Transform target;
 
     private Transform homeTarget;
-
     private SpriteRenderer spriteRenderer;
-
 
     private void Start()
     {
@@ -36,10 +34,10 @@ public class Ant : MonoBehaviour
     {
         CheckForFood();
 
-        //No target, moves randomly
+        // No target, moves randomly
         Vector2 randomTarget = (desiredDirection + Random.insideUnitCircle * wanderStrength).normalized;
 
-        //Follows target
+        // Follows target
         Vector2 foodTarget = target != null ? ((Vector2)target.position - rb.position).normalized : randomTarget;
 
         // Set the desired direction based on the presence of a target
@@ -53,9 +51,8 @@ public class Ant : MonoBehaviour
             holdingFood = false;
         }
 
-        // Calculate avoidance force and apply steering
-        Vector2 avoidanceForce = CalculateAvoidanceForce();
-        Vector2 desiredVelocity = (desiredDirection + avoidanceForce).normalized * maxSpeed;
+        // Calculate steering
+        Vector2 desiredVelocity = desiredDirection.normalized * maxSpeed;
         Vector2 desiredSteeringForce = (desiredVelocity - rb.velocity) * steerStrength;
         Vector2 acceleration = Vector2.ClampMagnitude(desiredSteeringForce, steerStrength);
 
@@ -69,19 +66,10 @@ public class Ant : MonoBehaviour
             rb.rotation = angle;
         }
 
-        //Ant is red when it sees food, unless the food is taken first, or ant brings food to home
-        if (holdingFood && target != null)
-        {
-            spriteRenderer.color = Color.red;
-        }
-        else
-        {
-            spriteRenderer.color = Color.black;
-        }
-
+        // Ant color change logic
+        spriteRenderer.color = holdingFood && target != null ? Color.red : Color.black;
     }
 
-    //Avoids colliding with other ants
     private Vector2 CalculateAvoidanceForce()
     {
         Vector2 avoidanceForce = Vector2.zero;
@@ -103,10 +91,9 @@ public class Ant : MonoBehaviour
         return avoidanceForce;
     }
 
-    //Ant keeps an eye out for food
     void CheckForFood()
     {
-        if (holdingFood == false)
+        if (!holdingFood)
         {
             GameObject[] foodObjects = GameObject.FindGameObjectsWithTag("Food");
 
@@ -147,22 +134,18 @@ public class Ant : MonoBehaviour
         }
     }
 
-
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.gameObject.tag == "Food")
+        if (other.CompareTag("Food"))
         {
             Destroy(other.gameObject);
             target = homeTarget;
         }
 
-        if (other.gameObject.tag == "Home")
+        if (other.CompareTag("Home"))
         {
             holdingFood = false;
             target = null;
         }
     }
-
-
-
 }
