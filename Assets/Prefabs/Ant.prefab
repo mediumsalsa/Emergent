@@ -101,6 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8a06adac9d140442be1a9d7e10c6aaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gizmoVisual: 0
   maxSpeed: 6
   steerStrength: 20
   wanderStrength: 0.05

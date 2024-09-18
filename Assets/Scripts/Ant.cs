@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Ant : MonoBehaviour
 {
+    public bool gizmoVisual = true;
+    private bool holdingFood = false;
+
     public float maxSpeed = 2;
     public float steerStrength = 2;
     public float wanderStrength = 1;
@@ -18,22 +21,25 @@ public class Ant : MonoBehaviour
 
     private Transform homeTarget;
 
+    private SpriteRenderer spriteRenderer;
+
 
     private void Start()
     {
         target = null;
         rb = GetComponent<Rigidbody2D>();
         homeTarget = GameObject.FindGameObjectWithTag("Home")?.transform;
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     private void Update()
     {
         CheckForFood();
 
-        // No target, moves randomly
+        //No target, moves randomly
         Vector2 randomTarget = (desiredDirection + Random.insideUnitCircle * wanderStrength).normalized;
 
-        // Follows target
+        //Follows target
         Vector2 foodTarget = target != null ? ((Vector2)target.position - rb.position).normalized : randomTarget;
 
         // Set the desired direction based on the presence of a target
@@ -44,6 +50,7 @@ public class Ant : MonoBehaviour
         else
         {
             desiredDirection = randomTarget;
+            holdingFood = false;
         }
 
         // Calculate avoidance force and apply steering
@@ -62,9 +69,17 @@ public class Ant : MonoBehaviour
             rb.rotation = angle;
         }
 
+        //Ant is red when it sees food, unless the food is taken first, or ant brings food to home
+        if (holdingFood && target != null)
+        {
+            spriteRenderer.color = Color.red;
+        }
+        else
+        {
+            spriteRenderer.color = Color.black;
+        }
 
     }
-
 
     //Avoids colliding with other ants
     private Vector2 CalculateAvoidanceForce()
@@ -88,22 +103,27 @@ public class Ant : MonoBehaviour
         return avoidanceForce;
     }
 
+    //Ant keeps an eye out for food
     void CheckForFood()
     {
-        GameObject[] foodObjects = GameObject.FindGameObjectsWithTag("Food");
-
-        foreach (GameObject food in foodObjects)
+        if (holdingFood == false)
         {
-            Vector2 directionToFood = (Vector2)(food.transform.position - transform.position);
-            float distanceToFood = directionToFood.magnitude;
+            GameObject[] foodObjects = GameObject.FindGameObjectsWithTag("Food");
 
-            if (distanceToFood <= foodDetectionDistance / 2)
+            foreach (GameObject food in foodObjects)
             {
-                float angle = Vector2.Angle(transform.right, directionToFood);
+                Vector2 directionToFood = (Vector2)(food.transform.position - transform.position);
+                float distanceToFood = directionToFood.magnitude;
 
-                if (angle <= foodDetectionRadius)
+                if (distanceToFood <= foodDetectionDistance / 2)
                 {
-                    target = food.transform;
+                    float angle = Vector2.Angle(transform.right, directionToFood);
+
+                    if (angle <= foodDetectionRadius)
+                    {
+                        target = food.transform;
+                        holdingFood = true;
+                    }
                 }
             }
         }
@@ -111,19 +131,20 @@ public class Ant : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        // Draw the detection radius as a wire sphere
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, foodDetectionDistance);
+        if (gizmoVisual)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(transform.position, foodDetectionDistance);
 
-        // Draw the field of view as a cone
-        Vector3 forward = transform.right * foodDetectionDistance;
-        Vector3 rightBoundary = Quaternion.Euler(0, 0, foodDetectionRadius / 2) * forward;
-        Vector3 leftBoundary = Quaternion.Euler(0, 0, -foodDetectionRadius / 2) * forward;
+            Vector3 forward = transform.right * foodDetectionDistance;
+            Vector3 rightBoundary = Quaternion.Euler(0, 0, foodDetectionRadius / 2) * forward;
+            Vector3 leftBoundary = Quaternion.Euler(0, 0, -foodDetectionRadius / 2) * forward;
 
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.position + forward);
-        Gizmos.DrawLine(transform.position, transform.position + rightBoundary);
-        Gizmos.DrawLine(transform.position, transform.position + leftBoundary);
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(transform.position, transform.position + forward);
+            Gizmos.DrawLine(transform.position, transform.position + rightBoundary);
+            Gizmos.DrawLine(transform.position, transform.position + leftBoundary);
+        }
     }
 
 
@@ -133,6 +154,12 @@ public class Ant : MonoBehaviour
         {
             Destroy(other.gameObject);
             target = homeTarget;
+        }
+
+        if (other.gameObject.tag == "Home")
+        {
+            holdingFood = false;
+            target = null;
         }
     }
 
