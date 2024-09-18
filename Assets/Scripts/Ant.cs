@@ -12,6 +12,8 @@ public class Ant : MonoBehaviour
 
     private Vector2 desiredDirection;
     private Rigidbody2D rb;
+    public Transform target;
+
 
     private void Start()
     {
@@ -20,7 +22,13 @@ public class Ant : MonoBehaviour
 
     private void Update()
     {
-        desiredDirection = (desiredDirection + Random.insideUnitCircle * wanderStrength).normalized;
+        //No target, moves randomly
+        Vector2 randomTarget = (desiredDirection + Random.insideUnitCircle * wanderStrength).normalized;
+        //Follows target
+        Vector2 foodTarget = ((Vector2)target.position - rb.position).normalized;
+
+        //Ant wants to go to current target
+        desiredDirection = foodTarget;
 
         Vector2 avoidanceForce = CalculateAvoidanceForce();
 
@@ -28,8 +36,11 @@ public class Ant : MonoBehaviour
         Vector2 desiredSteeringForce = (desiredVelocity - rb.velocity) * steerStrength;
         Vector2 acceleration = Vector2.ClampMagnitude(desiredSteeringForce, steerStrength);
 
+
+        //Calculated the ants speed
         rb.velocity = Vector2.ClampMagnitude(rb.velocity + acceleration * Time.deltaTime, maxSpeed);
 
+        //Turns the calculated radius into a degree, to rotate the ant
         if (rb.velocity != Vector2.zero)
         {
             float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
@@ -37,6 +48,8 @@ public class Ant : MonoBehaviour
         }
     }
 
+
+    //Avoids colliding with other ants
     private Vector2 CalculateAvoidanceForce()
     {
         Vector2 avoidanceForce = Vector2.zero;
@@ -55,7 +68,8 @@ public class Ant : MonoBehaviour
                 }
             }
         }
-
         return avoidanceForce;
     }
+
+
 }
