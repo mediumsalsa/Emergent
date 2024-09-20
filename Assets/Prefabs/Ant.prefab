@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2748533709956681252}
   - component: {fileID: 667250001950339393}
   - component: {fileID: 5169210939970373232}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Ant
   m_TagString: Ant
   m_Icon: {fileID: 0}
@@ -104,10 +104,10 @@ MonoBehaviour:
   gizmoVisual: 0
   maxSpeed: 6
   steerStrength: 20
-  wanderStrength: 0.05
-  avoidanceDistance: 2
+  wanderStrength: 0.1
+  avoidanceDistance: 4
   detectionRadius: 4
-  foodDetectionDistance: 10
+  foodDetectionDistance: 4
   foodDetectionRadius: 80
 --- !u!114 &2748533709956681252
 MonoBehaviour:
@@ -203,7 +203,7 @@ GameObject:
   m_Component:
   - component: {fileID: 296723351544393579}
   - component: {fileID: 1537192276188384789}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
