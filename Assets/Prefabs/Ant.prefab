@@ -105,10 +105,12 @@ MonoBehaviour:
   maxSpeed: 6
   steerStrength: 20
   wanderStrength: 0.1
-  avoidanceDistance: 4
-  detectionRadius: 4
+  avoidanceDistance: 3
+  detectionRadius: 1.5
   foodDetectionDistance: 4
   foodDetectionRadius: 80
+  trailPrefab: {fileID: 4903323503605238546, guid: d5b4529bbbff4144dbec09ee2239a7c7, type: 3}
+  trailInterval: 0.1
 --- !u!114 &2748533709956681252
 MonoBehaviour:
   m_ObjectHideFlags: 0

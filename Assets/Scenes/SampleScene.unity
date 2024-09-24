@@ -370,7 +370,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ant: {fileID: 2421752094110947580, guid: c61dc3ea37516dd4aa98225312ea63ba, type: 3}
-  numberOfAnts: 100
+  numberOfAnts: 300
 --- !u!4 &87912179 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1304995929843688535, guid: 2f5005227f17f4042bf27254b062918f, type: 3}
