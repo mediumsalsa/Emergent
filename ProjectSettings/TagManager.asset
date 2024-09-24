@@ -9,6 +9,7 @@ TagManager:
   - FoodSpotter
   - Home
   - Terrain
+  - FoodTrail
   layers:
   - Default
   - TransparentFX

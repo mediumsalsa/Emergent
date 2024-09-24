@@ -41,16 +41,13 @@ public class Ant : MonoBehaviour
     {
         CheckForFood();
 
-        // Calculate avoidance force
         Vector2 avoidanceForce = CalculateAvoidanceForce();
 
-        // No target, moves randomly
         Vector2 randomTarget = (desiredDirection + Random.insideUnitCircle * wanderStrength).normalized;
 
-        // Follows target
         Vector2 foodTarget = target != null ? ((Vector2)target.position - rb.position).normalized : randomTarget;
 
-        // Set the desired direction based on the presence of a target
+        //Set the desired direction based on the presence of a target
         if (target != null)
         {
             desiredDirection = foodTarget;
@@ -61,33 +58,39 @@ public class Ant : MonoBehaviour
             holdingFood = false;
         }
 
-        // Calculate steering
+        //Calculate steering
         Vector2 desiredVelocity = desiredDirection.normalized * maxSpeed;
         Vector2 desiredSteeringForce = (desiredVelocity - rb.velocity) * steerStrength;
 
-        // Combine steering force with avoidance force
         Vector2 steeringForce = desiredSteeringForce + avoidanceForce * 4;
 
-        // Apply steering force
         Vector2 acceleration = Vector2.ClampMagnitude(steeringForce, steerStrength);
 
-        // Update the ant's speed
+        //Update the ant's speed
         rb.velocity = Vector2.ClampMagnitude(rb.velocity + acceleration * Time.deltaTime, maxSpeed);
 
-        // Rotate the ant based on its velocity
+        //Rotate the ant based on its velocity
         if (rb.velocity != Vector2.zero)
         {
             float angle = Mathf.Atan2(rb.velocity.y, rb.velocity.x) * Mathf.Rad2Deg;
             rb.rotation = angle;
         }
 
-        // Ant color change logic
-        spriteRenderer.color = holdingFood && target != null ? Color.red : Color.black;
-
-        if (Time.time - lastTrailTime > trailInterval)
+        //Ant color change logic
+        if (holdingFood && target != null)
         {
-            lastTrailTime = Time.time;
-            CreateTrail(trailColour);
+            spriteRenderer.color = Color.red;
+            trailColour = Color.red;
+
+            if (Time.time - lastTrailTime > trailInterval)
+            {
+                lastTrailTime = Time.time;
+                CreateTrail(trailColour);
+            }
+        }
+        else
+        {
+            spriteRenderer.color = Color.black;
         }
     }
 
@@ -130,8 +133,6 @@ public class Ant : MonoBehaviour
                     if (angle <= foodDetectionRadius)
                     {
                         target = food.transform;
-                        holdingFood = true;
-                        trailColour = Color.red;
                     }
                 }
             }
@@ -149,15 +150,15 @@ public class Ant : MonoBehaviour
     {
         if (gizmoVisual)
         {
-            // Draw the food detection distance
+            //Draw the food detection distance
             Gizmos.color = Color.green;
             Gizmos.DrawWireSphere(transform.position, foodDetectionDistance);
 
-            // Draw the avoidance distance
-            Gizmos.color = Color.red; // Change color for avoidance distance
+            //Draw the avoidance distance
+            Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(transform.position, detectionRadius);
 
-            // Draw the food detection direction
+            //Draw the food detection direction
             Vector3 forward = transform.right * foodDetectionDistance;
             Vector3 rightBoundary = Quaternion.Euler(0, 0, foodDetectionRadius / 2) * forward;
             Vector3 leftBoundary = Quaternion.Euler(0, 0, -foodDetectionRadius / 2) * forward;
@@ -173,7 +174,11 @@ public class Ant : MonoBehaviour
     {
         if (other.CompareTag("Food"))
         {
-            Destroy(other.gameObject);
+            if (holdingFood == false)
+            { 
+                Destroy(other.gameObject);
+            }
+            holdingFood = true;
             target = homeTarget;
         }
 
@@ -184,3 +189,10 @@ public class Ant : MonoBehaviour
         }
     }
 }
+
+//Shitty pseudo code
+//To do later
+
+//ant checks for trails, once every few frames, like it checks for food.
+//Ant then compares all trail dots around it, targeting the one with the lowest lifespan
+//Which would be the trail dots closest to the food
