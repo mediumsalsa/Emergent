@@ -402,6 +402,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FoodSpawner (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 4999487339778754068, guid: b486b624a3c5bf0469ba4c1eb4d8792c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -543,6 +547,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FoodSpawner (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 4999487339778754068, guid: b486b624a3c5bf0469ba4c1eb4d8792c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -600,11 +608,72 @@ PrefabInstance:
       propertyPath: m_Name
       value: FoodSpawner (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4999487339778754068, guid: b486b624a3c5bf0469ba4c1eb4d8792c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b486b624a3c5bf0469ba4c1eb4d8792c, type: 3}
+--- !u!1 &2003651536
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2003651538}
+  - component: {fileID: 2003651537}
+  - component: {fileID: 2003651539}
+  m_Layer: 0
+  m_Name: Quad Tree
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!114 &2003651537
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2003651536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 775875941035c3f4584f59ba4815a556, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &2003651538
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2003651536}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 32.718353, y: 5.0418863, z: -0.54770285}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2003651539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2003651536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ed6b7b5f74dc2243b3412c6e29edd64, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &9205587747613126979
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -673,3 +742,4 @@ SceneRoots:
   - {fileID: 1902325144}
   - {fileID: 754031273}
   - {fileID: 1218345764}
+  - {fileID: 2003651538}
