@@ -105,12 +105,13 @@ MonoBehaviour:
   maxSpeed: 6
   steerStrength: 20
   wanderStrength: 0.1
-  avoidanceDistance: 3
-  detectionRadius: 1.5
   foodDetectionDistance: 4
   foodDetectionRadius: 80
-  trailPrefab: {fileID: 4903323503605238546, guid: d5b4529bbbff4144dbec09ee2239a7c7, type: 3}
-  trailInterval: 0.1
+  framesBetweenFoodCheck: 5
+  foodTrailPrefab: {fileID: 4903323503605238546, guid: d5b4529bbbff4144dbec09ee2239a7c7, type: 3}
+  homeTrailPrefab: {fileID: 1441768463434060755, guid: ee781ba694039f4438705b7d5bbbda5e, type: 3}
+  trailColour: {r: 0, g: 0, b: 0, a: 0}
+  trailInterval: 0.2
 --- !u!114 &2748533709956681252
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -179,7 +180,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0.1748932, y: 0}

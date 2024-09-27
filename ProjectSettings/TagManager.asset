@@ -10,6 +10,7 @@ TagManager:
   - Home
   - Terrain
   - FoodTrail
+  - HomeTrail
   layers:
   - Default
   - TransparentFX
