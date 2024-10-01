@@ -11,6 +11,7 @@ TagManager:
   - Terrain
   - FoodTrail
   - HomeTrail
+  - Wall
   layers:
   - Default
   - TransparentFX

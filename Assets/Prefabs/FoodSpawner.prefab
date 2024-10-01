@@ -98,5 +98,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ant: {fileID: 239179697960067041, guid: 2f5005227f17f4042bf27254b062918f, type: 3}
-  numberOfAnts: 100
+  numberOfAnts: 175
   spawnRadius: 7

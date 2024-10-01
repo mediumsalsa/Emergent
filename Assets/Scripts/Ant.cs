@@ -33,7 +33,6 @@ public class Ant : MonoBehaviour
     private SpriteRenderer spriteRenderer;
 
     private bool holdingFood = false;
-    private bool leavingHome = true;
 
     private void Start()
     {
@@ -89,18 +88,15 @@ public class Ant : MonoBehaviour
         //Ant color change logic
         if (holdingFood)
         {
-            //spriteRenderer.color = Color.red;
             trailColour = Color.red;
-
             if (Time.time - lastTrailTime > trailInterval)
             {
                 lastTrailTime = Time.time;
                 CreateTrail(trailColour, foodTrailPrefab);
             }
         }
-        else if (leavingHome == true)
+        else
         {
-            //spriteRenderer.color = Color.blue;
             trailColour = Color.blue;
             if (Time.time - lastTrailTime > trailInterval)
             {
@@ -108,10 +104,7 @@ public class Ant : MonoBehaviour
                 CreateTrail(trailColour, homeTrailPrefab);
             }
         }
-        else
-        {
-            //spriteRenderer.color = Color.black;
-        }
+
     }
 
     void CreateTrail(Color color, GameObject trailPrefab)
@@ -146,73 +139,19 @@ public class Ant : MonoBehaviour
     }
 
 
-    void CheckForHomeTrail()
-    {
-        if (holdingFood)
-        {
-            GameObject[] trailObjects = GameObject.FindGameObjectsWithTag("HomeTrail");
-            Transform closestTrail = null;
-            float lowestRemainingLifetime = float.MaxValue;
-
-            foreach (GameObject trail in trailObjects)
-            {
-                Vector2 directionToTrail = (Vector2)(trail.transform.position - transform.position);
-                float distanceToTrail = directionToTrail.magnitude;
-
-                if (distanceToTrail <= foodDetectionDistance / 2)
-                {
-                    float angle = Vector2.Angle(transform.right, directionToTrail);
-
-                    if (angle <= foodDetectionRadius)
-                    {
-                        //Get the Fade component to access remaining lifetime
-                        Fade fadeComponent = trail.GetComponent<Fade>();
-                        float remainingLifetime = fadeComponent.lifetime - (Time.time - fadeComponent.spriteRenderer.color.a);
-
-                        //Check if this trail has the lowest remaining lifetime so far
-                        if (remainingLifetime < lowestRemainingLifetime)
-                        {
-                            lowestRemainingLifetime = remainingLifetime;
-                            closestTrail = trail.transform; // Update the target
-                        }
-                    }
-                }
-            }
-            
-            if (closestTrail != null)
-            {
-                target = closestTrail;
-            }
-        }
-    }
-
 
     void CheckForFoodTrail()
     {
-        if (!holdingFood)
+        if (!holdingFood )
         {
-            GameObject[] foodObjects = GameObject.FindGameObjectsWithTag("Food");
+            if (target != null && target.tag == "Food") return;
+
             GameObject[] trailObjects = GameObject.FindGameObjectsWithTag("FoodTrail");
             Transform closestTrail = null;
-            Transform closestFood = null;
             float lowestRemainingLifetime = float.MaxValue;
 
-            //Check for food first
-            foreach (GameObject food in foodObjects)
-            {
-                Vector2 directionToFood = (Vector2)(food.transform.position - transform.position);
-                float distanceToFood = directionToFood.magnitude;
-
-                if (distanceToFood <= foodDetectionDistance)
-                {
-                    closestFood = food.transform;
-                    break; //Exit early if food is found
-                }
-            }
-
             //If no food is detected, check for the trail
-            if (closestFood == null)
-            {
+
                 foreach (GameObject trail in trailObjects)
                 {
                     Vector2 directionToTrail = (Vector2)(trail.transform.position - transform.position);
@@ -237,14 +176,8 @@ public class Ant : MonoBehaviour
                         }
                     }
                 }
-            }
-
-            //Set the target to the closest food if found, otherwise to the closest trail
-            if (closestFood != null)
-            {
-                target = closestFood;
-            }
-            else if (closestTrail != null)
+            
+            if (closestTrail != null)
             {
                 target = closestTrail;
             }
@@ -281,17 +214,7 @@ public class Ant : MonoBehaviour
                 Destroy(other.gameObject);
             }
             holdingFood = true;
-            leavingHome = false;
-            target = null;
-
-            float tempRadius = foodDetectionRadius;
-            foodDetectionRadius = 360;
-
-            CheckForHomeTrail();
-
-            //target = homeTarget;
-
-            foodDetectionRadius = tempRadius;
+            target = homeTarget;
         }
 
         if (other.CompareTag("Home"))
@@ -299,7 +222,6 @@ public class Ant : MonoBehaviour
             if (holdingFood == true)
             {
                 holdingFood = false;
-                leavingHome = true;
                 target = null;
             }
 
@@ -318,20 +240,7 @@ public class Ant : MonoBehaviour
                 CheckForFoodTrail();
             }
         }
-
-        if (other.CompareTag("HomeTrail"))
-        {
-            if (!holdingFood)
-            {
-                CheckForHomeTrail();
-            }
-        }
     }
+
+
 }
-
-//Shitty pseudo code
-//To do later
-
-//ant checks for trails, once every few frames, like it checks for food.
-//Ant then compares all trail dots around it, targeting the one with the lowest lifespan
-//Which would be the trail dots closest to the food
