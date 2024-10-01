@@ -66,7 +66,6 @@ public class Ant : MonoBehaviour
         else
         {
             desiredDirection = randomTarget;
-            holdingFood = false;
         }
 
         //Calculate steering
@@ -88,9 +87,9 @@ public class Ant : MonoBehaviour
         }
 
         //Ant color change logic
-        if (holdingFood && target != null)
+        if (holdingFood)
         {
-            spriteRenderer.color = Color.red;
+            //spriteRenderer.color = Color.red;
             trailColour = Color.red;
 
             if (Time.time - lastTrailTime > trailInterval)
@@ -101,6 +100,7 @@ public class Ant : MonoBehaviour
         }
         else if (leavingHome == true)
         {
+            //spriteRenderer.color = Color.blue;
             trailColour = Color.blue;
             if (Time.time - lastTrailTime > trailInterval)
             {
@@ -110,7 +110,7 @@ public class Ant : MonoBehaviour
         }
         else
         {
-            spriteRenderer.color = Color.black;
+            //spriteRenderer.color = Color.black;
         }
     }
 
@@ -150,47 +150,36 @@ public class Ant : MonoBehaviour
     {
         if (holdingFood)
         {
-            GameObject[] foodObjects = GameObject.FindGameObjectsWithTag("Food");
-            GameObject[] trailObjects = GameObject.FindGameObjectsWithTag("FoodTrail");
+            GameObject[] trailObjects = GameObject.FindGameObjectsWithTag("HomeTrail");
             Transform closestTrail = null;
-            Transform closestFood = null;
             float lowestRemainingLifetime = float.MaxValue;
 
-            //If no food is detected, check for the trail
-            if (closestFood == null)
+            foreach (GameObject trail in trailObjects)
             {
-                foreach (GameObject trail in trailObjects)
+                Vector2 directionToTrail = (Vector2)(trail.transform.position - transform.position);
+                float distanceToTrail = directionToTrail.magnitude;
+
+                if (distanceToTrail <= foodDetectionDistance / 2)
                 {
-                    Vector2 directionToTrail = (Vector2)(trail.transform.position - transform.position);
-                    float distanceToTrail = directionToTrail.magnitude;
+                    float angle = Vector2.Angle(transform.right, directionToTrail);
 
-                    if (distanceToTrail <= foodDetectionDistance / 2)
+                    if (angle <= foodDetectionRadius)
                     {
-                        float angle = Vector2.Angle(transform.right, directionToTrail);
+                        //Get the Fade component to access remaining lifetime
+                        Fade fadeComponent = trail.GetComponent<Fade>();
+                        float remainingLifetime = fadeComponent.lifetime - (Time.time - fadeComponent.spriteRenderer.color.a);
 
-                        if (angle <= foodDetectionRadius)
+                        //Check if this trail has the lowest remaining lifetime so far
+                        if (remainingLifetime < lowestRemainingLifetime)
                         {
-                            //Get the Fade component to access remaining lifetime
-                            Fade fadeComponent = trail.GetComponent<Fade>();
-                            float remainingLifetime = fadeComponent.lifetime - (Time.time - fadeComponent.spriteRenderer.color.a);
-
-                            //Check if this trail has the lowest remaining lifetime so far
-                            if (remainingLifetime < lowestRemainingLifetime)
-                            {
-                                lowestRemainingLifetime = remainingLifetime;
-                                closestTrail = trail.transform; // Update the target
-                            }
+                            lowestRemainingLifetime = remainingLifetime;
+                            closestTrail = trail.transform; // Update the target
                         }
                     }
                 }
             }
-
-            //Set the target to the closest food if found, otherwise to the closest trail
-            if (closestFood != null)
-            {
-                target = closestFood;
-            }
-            else if (closestTrail != null)
+            
+            if (closestTrail != null)
             {
                 target = closestTrail;
             }
@@ -299,6 +288,8 @@ public class Ant : MonoBehaviour
             foodDetectionRadius = 360;
 
             CheckForHomeTrail();
+
+            //target = homeTarget;
 
             foodDetectionRadius = tempRadius;
         }
