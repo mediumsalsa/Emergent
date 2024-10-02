@@ -2,114 +2,52 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class QuadTree : MonoBehaviour
+public class Quadtree : MonoBehaviour
 {
-    public const int maxObjects = 2;
-    public const int maxSubdivisions = 10;
 
-    private int level;
-    private List<GameObject> ants;
-    private Rect bounds;
-    private QuadTree[] subdividions;
+    [SerializeField] private int height = 100;
+    [SerializeField] private int width = 100;
 
-    public int AntsCount => ants.Count;
+    private Vector2 ne;
+    private Vector2 nw;
+    private Vector2 se;
+    private Vector2 sw;
 
-    public void Initialize(int currentSubdividion, Rect bounds)
+    private Rect currentQuad;
+
+    private int numberOfSplits;
+
+    private void Start()
     {
-        this.level = currentSubdividion;
-        this.bounds = bounds;
-        this.ants = new List<GameObject>();
-        this.subdividions = new QuadTree[4];
+        ne = new Vector2(-width, height);
+        nw = new Vector2(width, height);
+        se = new Vector2(-width, -height);
+        sw = new Vector2(width, -height);
+
+        currentQuad = new Rect(ne.x, ne.y, nw.x, se.y);
     }
 
-    private void Subdivide()
+    private void SplitTree()
     {
-       // if (subdividions[0] != null) return;
-
-        Debug.Log("Subdivided");
-
-        float subWidth = bounds.width / 2f;
-        float subHeight = bounds.height / 2f;
-        float x = bounds.x;
-        float y = bounds.y;
-
-        for (int i = 0; i < subdividions.Length; i++)
-        {
-            GameObject subQuadTreeObject = new GameObject($"QuadTree_Level_{level + 1}_Index_{i}");
-            subdividions[i] = subQuadTreeObject.AddComponent<QuadTree>();
-        }
-
-        // Initialize each subdivision with the correct bounds
-        subdividions[0].Initialize(level + 1, new Rect(x + subWidth, y, subWidth, subHeight));
-        subdividions[1].Initialize(level + 1, new Rect(x, y, subWidth, subHeight));
-        subdividions[2].Initialize(level + 1, new Rect(x, y + subHeight, subWidth, subHeight));
-        subdividions[3].Initialize(level + 1, new Rect(x + subWidth, y + subHeight, subWidth, subHeight));
-
+        ne.x /= 2; ne.y /= 2;
+        nw.x /= 2; nw.y /= 2;
+        se.x /= 2; se.y /= 2;
+        sw.x /= 2; sw.y /= 2;
     }
 
-    public void OrganizeObjects(List<GameObject> existingObjects)
+
+    private void OnDrawGizmos()
     {
-        ants.Clear();
+        ne = new Vector2(-width, height);
+        nw = new Vector2(width, height);
+        se = new Vector2(-width, -height);
+        sw = new Vector2(width, -height);
 
-        foreach (var obj in existingObjects)
-        {
-            if (bounds.Contains(obj.transform.position))
-            {
-                ants.Add(obj);
-            }
-        }
-
-        if (ants.Count > maxObjects && level < maxSubdivisions)
-        {
-            Subdivide();
-            for (int i = ants.Count - 1; i >= 0; i--)
-            {
-                GameObject obj = ants[i];
-                int index = GetIndex(obj);
-                if (index != -1)
-                {
-                    subdividions[index].ants.Add(obj);
-                    ants.RemoveAt(i);
-                }
-            }
-        }
+        Gizmos.color = Color.red;
+        Gizmos.DrawLine(ne, nw);
+        Gizmos.DrawLine(ne, se);
+        Gizmos.DrawLine(se, sw);
+        Gizmos.DrawLine(sw, nw);
     }
 
-    private int GetIndex(GameObject obj)
-    {
-        Vector3 pos = obj.transform.position;
-        bool topQuadrant = (pos.y > bounds.y + bounds.height / 2);
-        bool bottomQuadrant = (pos.y < bounds.y + bounds.height / 2);
-
-        if (pos.x < bounds.x + bounds.width / 2)
-        {
-            if (topQuadrant) return 1; // Top left
-            else if (bottomQuadrant) return 2; // Bottom left
-        }
-        else
-        {
-            if (topQuadrant) return 0; // Top right
-            else if (bottomQuadrant) return 3; // Bottom right
-        }
-
-        return -1; // Not in any quadrant
-    }
-
-    public void DrawTree()
-    {
-        // Draw the boundaries of the current QuadTree node
-        Debug.DrawLine(new Vector2(bounds.x, bounds.y), new Vector2(bounds.x + bounds.width, bounds.y), Color.green);
-        Debug.DrawLine(new Vector2(bounds.x, bounds.y), new Vector2(bounds.x, bounds.y + bounds.height), Color.green);
-        Debug.DrawLine(new Vector2(bounds.x + bounds.width, bounds.y), new Vector2(bounds.x + bounds.width, bounds.y + bounds.height), Color.green);
-        Debug.DrawLine(new Vector2(bounds.x, bounds.y + bounds.height), new Vector2(bounds.x + bounds.width, bounds.y + bounds.height), Color.green);
-
-        //Draw subdivisions if they exist
-        for (int i = 0; i < subdividions.Length; i++)
-        {
-            if (subdividions[i] != null)
-            {
-                subdividions[i].DrawTree();
-            }
-        }
-    }
 }
